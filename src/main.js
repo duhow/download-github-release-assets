@@ -72,18 +72,22 @@ async function run() {
 
     const asset = assets[0];
     // for await (const asset of assets) {
-      core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
-      const file = fs.createWriteStream(asset.name);
-      const { data: buffer } = await octokit.rest.repos.getReleaseAsset({
-        headers: { Accept: 'application/octet-stream' },
-        owner,
-        repo,
-        asset_id: asset.id,
-      });
+    core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
+    const file = fs.createWriteStream(asset.name);
+    const { data: buffer } = octokit.rest.repos.getReleaseAsset({
+      headers: { Accept: 'application/octet-stream' },
+      owner,
+      repo,
+      asset_id: asset.id,
+    });
+    if (buffer) {
       core.debug(buffer);
       core.debug(JSON.stringify(buffer));
       file.write(buffer);
       file.end();
+    } else {
+      core.setFailed(`No buffer. ${buffer}`);
+    }
     // }
   } catch (error) {
     core.setFailed(`Failed. ${error.message}`);
