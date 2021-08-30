@@ -74,7 +74,10 @@ async function run() {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
       const file = fs.createWriteStream(asset.name);
       const buffer = octokit.rest.repos.getReleaseAsset({
-        owner, repo, asset_id: asset.id,
+        headers: { Accept: 'application/octet-stream' },
+        owner,
+        repo,
+        asset_id: asset.id,
       });
       core.debug(buffer);
       core.debug(JSON.stringify(buffer));
