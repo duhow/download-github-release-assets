@@ -52,6 +52,7 @@ async function run() {
         repo: repo,
         asset_id: asset.id,
       });
+      core.debug(JSON.stringify(buffer));
       file.write(buffer.data);
       file.end();
     }
