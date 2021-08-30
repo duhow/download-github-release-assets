@@ -17,8 +17,8 @@ inputs:
     description: 'The release version to fetch from in the form `tags/<tag_name>`'
     required: false
     default: ''
-  file:
-    description: 'The name of the file to be downloaded.'
+  files:
+    description: 'Name or list of files to download.'
     required: true
   target:
     description: 'Target file path.'
@@ -34,7 +34,7 @@ outputs:
 
 runs:
   using: 'node12'
-  main: 'dist/main.js'
+  main: 'dist/index.js'
 
 branding:
   color: 'orange'
