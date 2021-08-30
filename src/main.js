@@ -1,23 +1,20 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const core = require('@actions/core');
 const github = require('@actions/github');
+import { Buffer } from 'buffer';
+
 // const glob = require('@actions/glob')
 
 const token = core.getInput('token');
 const octokit = github.getOctokit(token);
-const { context } = github;
 
 function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEscape).join('.*')}$`); }
 function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
 
 async function run() {
   try {
-    let repository = core.getInput('repository');
-    if (!repository) { repository = '{context.repo.owner}/{context.repo.repo}'; }
-    core.info(`Using GitHub repository: ${repository}`);
-
-    const [owner, repo] = repository.split('/');
-    core.debug(`owner: ${owner}, repo: ${repo}.`);
+    const [owner, repo] = core.getInput("repository", { required: true }).split("/");
+    core.info(`Using GitHub repository: ${owner}/${repo}`);
 
     const tag = core.getInput('tag');
     const releaseId = core.getInput('release-id');
@@ -70,27 +67,21 @@ async function run() {
       core.info(`${assets.length} assets selected.`);
     }
 
-    const asset = assets[0];
-    // for await (const asset of assets) {
-    core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
-    const file = fs.createWriteStream(asset.name);
-    const { data: buffer } = octokit.rest.repos.getReleaseAsset({
-      headers: { Accept: 'application/octet-stream' },
-      owner,
-      repo,
-      asset_id: asset.id,
-    });
-    if (buffer) {
-      core.debug(buffer);
-      core.debug(JSON.stringify(buffer));
-      file.write(buffer);
+    assets.forEach(asset => {
+      core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
+      const file = fs.createWriteStream(asset.name);
+      const buffer = await octokit.rest.repos.getReleaseAsset({
+        headers: { Accept: 'application/octet-stream' },
+        owner,
+        repo,
+        asset_id: asset.id,
+      });
+
+      await file.write(Buffer.from(buffer.data));
       file.end();
-    } else {
-      core.setFailed(`No buffer. ${buffer}`);
-    }
-    // }
+    });
   } catch (error) {
-    core.setFailed(`Failed. ${error.message}`);
+    core.setFailed(error.message);
   }
 }
 
