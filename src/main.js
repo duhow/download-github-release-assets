@@ -11,8 +11,7 @@ async function run() {
   if (!repository) { repository = `{context.repo.owner}/{context.repo.repo}`; }
   core.info(`Using GitHub repository: ${repository}`);
 
-  const owner = repository.split('/')[0];
-  const repo = repository.split('/')[1];
+  const [owner, repo] = repository.split('/');
   core.debug(`owner: ${owner}, repo: ${repo}.`)
 
   const tag = core.getInput('tag');
@@ -20,13 +19,13 @@ async function run() {
 
   if (tag) {
     core.info(`Getting release by tag: ${tag}`);
-    const { data: release } = await octokit.rest.repos.getReleaseByTag(owner, repo, tag);
+    const { data: release } = await octokit.repos.getReleaseByTag(owner, repo, tag);
   } else if (releaseId && releaseId === 'latest') {
     core.info('Getting latest release');
-    const { data: release } = await octokit.rest.repos.getLatestRelease(owner, repo);
+    const { data: release } = await octokit.repos.getLatestRelease(owner, repo);
   } else if (releaseId) {
     core.info(`Getting release ID: ${releaseId}`);
-    const { data: release } = await octokit.rest.repos.getRelease(owner, repo, releaseId);
+    const { data: release } = await octokit.repos.getRelease(owner, repo, releaseId);
   } else {
     core.setFailed('No valid tag or release ID provided.');
   }
