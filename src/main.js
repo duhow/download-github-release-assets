@@ -7,6 +7,9 @@ const token = core.getInput('token');
 const octokit = github.getOctokit(token);
 const { context } = github;
 
+function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEscape).join('.*')}$`); }
+function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
+
 async function run() {
   let repository = core.getInput('repository');
   if (!repository) { repository = '{context.repo.owner}/{context.repo.repo}'; }
@@ -37,27 +40,52 @@ async function run() {
     core.setFailed('Release does not exist or is unaccessible.');
   }
 
-  core.info(`${release.data.assets.length} assets available.`)
+  core.info(`${release.data.assets.length} assets available.`);
 
-  core.debug(JSON.stringify(release))
+  core.debug(JSON.stringify(release));
 
-  if(selectorFiles.length == 1 && selectorFiles[0] === '*'){
-    core.info('Downloading all assets available')
-    for(const asset of release.data.assets){
-      core.info(`Downloading ${asset.name} with ${asset.size} bytes`)
-      const file = fs.createWriteStream(asset.name);
-      const buffer = await octokit.rest.repos.getReleaseAsset({
-        headers: {Accept: 'application/octet-stream'},
-        owner: owner,
-        repo: repo,
-        asset_id: asset.id,
-      });
-      core.debug(JSON.stringify(buffer));
-      file.write(buffer.data);
-      file.end();
-    }
+  if (release.data.assets.length === 0) {
+    core.warning('No assets available, exiting.');
+    return;
   }
 
+  let assets = [];
+
+  if (selectorFiles.length === 1 && selectorFiles[0] === '*') {
+    core.info('Downloading all assets available');
+    assets = release.data.assets;
+  } else {
+    for (const asset of release.data.assets) {
+      for (const name of selectorFiles) {
+        const rexpr = wildcardToRegExp(name);
+        if (asset.name.match(rexpr)) {
+          assets.push(asset);
+        }
+      }
+    }
+    if (assets.length <= 0) {
+      core.setFailed('No assets selected or available.');
+    }
+    core.info(`{assets.length} assets selected.`);
+  }
+
+  for (const asset of assets) {
+    core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
+    const file = fs.createWriteStream(asset.name);
+    const buffer = octokit.rest.repos.getReleaseAsset({
+      headers: { Accept: 'application/octet-stream' },
+      owner,
+      repo,
+      asset_id: asset.id,
+    });
+    // core.debug(JSON.stringify(buffer));
+    file.write(buffer);
+    file.end();
+  }
 }
 
-run();
+try {
+  run();
+} catch (error) {
+  core.setFailed(`Failed. ${error.message}`);
+}
