@@ -1,6 +1,4 @@
-import { Buffer } from 'buffer';
-
-const fs = require('fs').promises;
+const fs = require('fs');
 const core = require('@actions/core');
 const github = require('@actions/github');
 
@@ -70,13 +68,15 @@ async function run() {
 
     assets.forEach(async (asset) => {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
-      // const file = fs.createWriteStream(asset.name);
-      await octokit.rest.repos.getReleaseAsset({
+      const file = fs.createWriteStream(asset.name);
+      octokit.rest.repos.getReleaseAsset({
         headers: { Accept: 'application/octet-stream' },
         owner,
         repo,
         asset_id: asset.id,
-      }).then((buffer) => fs.writeFile(asset.name, buffer.data));
+      }).then(({ buffer }) => {
+        file.write(buffer);
+      });
 
       // await file.write(Buffer.from(buffer.data));
       // file.end();
