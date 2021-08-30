@@ -1,12 +1,13 @@
+const fs = require('fs');
 const core = require('@actions/core');
 const github = require('@actions/github');
 // const glob = require('@actions/glob')
 
-async function run() {
-  const { context } = github;
-  const token = core.getInput('token');
-  const octokit = github.getOctokit(token);
+const token = core.getInput('token');
+const octokit = github.getOctokit(token);
+const { context } = github;
 
+async function run() {
   let repository = core.getInput('repository');
   if (!repository) { repository = '{context.repo.owner}/{context.repo.repo}'; }
   core.info(`Using GitHub repository: ${repository}`);
@@ -16,6 +17,7 @@ async function run() {
 
   const tag = core.getInput('tag');
   const releaseId = core.getInput('release-id');
+  const selectorFiles = core.getInput('files').split('\n');
 
   let release = null;
   if (tag) {
@@ -31,11 +33,30 @@ async function run() {
     core.setFailed('No valid tag or release ID provided.');
   }
 
-  if (!release) {
+  if (!release || !release.data) {
     core.setFailed('Release does not exist or is unaccessible.');
   }
 
-  console.log(JSON.stringify(release))
+  core.info(`{release.data.assets.length} assets available.`)
+
+  core.debug(JSON.stringify(release))
+
+  if(selectorFiles.length == 1 && selectorFiles[0] === '*'){
+    core.info('Downloading all assets available')
+    for(const asset of release.data.assets){
+      core.info(`Downloading {asset.name} with {asset.size} bytes`)
+      const file = fs.createWriteStream(asset.name);
+      const buffer = await octokit.rest.repos.getReleaseAsset({
+        headers: {Accept: 'application/octet-stream'},
+        owner: owner,
+        repo: repo,
+        asset_id: asset.id,
+      });
+      file.write(buffer);
+      file.end();
+    }
+  }
+
 }
 
 run();
