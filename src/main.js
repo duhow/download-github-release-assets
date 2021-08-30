@@ -19,13 +19,13 @@ async function run() {
 
   if (tag) {
     core.info(`Getting release by tag: ${tag}`);
-    const { data: release } = await octokit.repos.getReleaseByTag(owner, repo, tag);
+    const { data: release } = await octokit.rest.repos.getReleaseByTag(owner, repo, tag);
   } else if (releaseId && releaseId === 'latest') {
     core.info('Getting latest release');
-    const { data: release } = await octokit.repos.getLatestRelease(owner, repo);
+    const { data: release } = await octokit.rest.repos.getLatestRelease(owner, repo);
   } else if (releaseId) {
     core.info(`Getting release ID: ${releaseId}`);
-    const { data: release } = await octokit.repos.getRelease(owner, repo, releaseId);
+    const { data: release } = await octokit.rest.repos.getRelease(owner, repo, releaseId);
   } else {
     core.setFailed('No valid tag or release ID provided.');
   }
@@ -34,7 +34,7 @@ async function run() {
     core.setFailed('Release does not exist or is unaccessible.');
   }
 
-  core.info(release);
+  console.log(release);
 }
 
 run();
