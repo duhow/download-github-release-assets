@@ -70,11 +70,11 @@ async function run() {
       core.info(`${assets.length} assets selected.`);
     }
 
-    for (const asset of assets) {
+    for await (const asset of assets) {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
       const file = fs.createWriteStream(asset.name);
-      const buffer = await octokit.rest.repos.getReleaseAsset({
-        owner, repo, asset.id,
+      const buffer = octokit.rest.repos.getReleaseAsset({
+        owner, repo, asset_id: asset.id,
       });
       core.debug(buffer);
       core.debug(JSON.stringify(buffer));
