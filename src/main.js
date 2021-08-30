@@ -67,20 +67,18 @@ async function run() {
       if (assets.length <= 0) {
         core.setFailed('No assets selected or available.');
       }
-      core.info(`{assets.length} assets selected.`);
+      core.info(`${assets.length} assets selected.`);
     }
 
     for (const asset of assets) {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
       const file = fs.createWriteStream(asset.name);
       const buffer = await octokit.rest.repos.getReleaseAsset({
-        headers: { Accept: 'application/octet-stream' },
-        owner,
-        repo,
-        asset_id: asset.id,
+        owner, repo, asset.id
       });
-      // core.debug(JSON.stringify(buffer));
-      await file.write(buffer);
+      core.debug(buffer);
+      core.debug(JSON.stringify(buffer));
+      file.write(buffer);
       file.end();
     }
   } catch (error) {
