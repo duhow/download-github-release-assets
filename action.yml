@@ -4,19 +4,20 @@ description: 'Downloads assets from a GitHub release'
 inputs:
   token:
     description: 'The GitHub token. Typically this will be secrets.GITHUB_TOKEN'
-    required: true
+    default: ${{ github.token }}
+    required: false
   repository:
     description: 'The `organization/repository` containing the release.'
+    default: ${{ github.repository }}
     required: false
-    default: ''
   release-id:
     description: 'The release ID version to fetch from.'
-    required: false
     default: 'latest'
+    required: false
   tag:
     description: 'The release version to fetch from in the form `tags/<tag_name>`'
-    required: false
     default: ''
+    required: false
   files:
     description: 'Name or list of files to download.'
     required: true

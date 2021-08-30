@@ -14,7 +14,7 @@ async function run() {
     core.setFailed(error.message);
   }
 
-  if (!repository) { repository = context.repo.repo; }
+  if (!repository) { repository = `{context.repo.owner}/{context.repo.repo}`; }
   core.info(`Using GitHub repository: ${repository}`);
 
   const owner = repository.split('/')[0];
