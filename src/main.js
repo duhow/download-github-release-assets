@@ -31,11 +31,11 @@ async function run() {
     core.setFailed('No valid tag or release ID provided.');
   }
 
-  core.info(release);
-
   if (!release) {
     core.setFailed('Release does not exist or is unaccessible.');
   }
+
+  console.log(JSON.stringify(release))
 }
 
 run();
