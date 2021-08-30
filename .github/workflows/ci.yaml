@@ -24,9 +24,11 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    # Need root node_modules because certain npm packages like jest are configured for the entire repository and it won't be possible
-    # without these to just compile the artifacts package
     - name: Run npm
-      run: |
-        npm install
-        npm ci
+      run: npm install
+
+    - name: Self-test
+      uses: ./
+      with:
+        tag: demo
+        files: *
