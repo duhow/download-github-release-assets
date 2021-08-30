@@ -76,9 +76,10 @@ async function run() {
         owner,
         repo,
         asset_id: asset.id,
-      });
+      }).then(
+        fs.writeFile(asset.name, buffer.data);
+      );
 
-      await fs.writeFile(asset.name, buffer.data);
       // await file.write(Buffer.from(buffer.data));
       // file.end();
     });
