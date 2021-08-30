@@ -69,7 +69,7 @@ async function run() {
     assets.forEach(async (asset) => {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
       const file = fs.createWriteStream(asset.name);
-      octokit.rest.repos.getReleaseAsset({
+      await octokit.rest.repos.getReleaseAsset({
         headers: { Accept: 'application/octet-stream' },
         owner,
         repo,
