@@ -11,81 +11,81 @@ function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEs
 function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
 
 async function run() {
-  let repository = core.getInput('repository');
-  if (!repository) { repository = '{context.repo.owner}/{context.repo.repo}'; }
-  core.info(`Using GitHub repository: ${repository}`);
+  try {
+    let repository = core.getInput('repository');
+    if (!repository) { repository = '{context.repo.owner}/{context.repo.repo}'; }
+    core.info(`Using GitHub repository: ${repository}`);
 
-  const [owner, repo] = repository.split('/');
-  core.debug(`owner: ${owner}, repo: ${repo}.`);
+    const [owner, repo] = repository.split('/');
+    core.debug(`owner: ${owner}, repo: ${repo}.`);
 
-  const tag = core.getInput('tag');
-  const releaseId = core.getInput('release-id');
-  const selectorFiles = core.getInput('files').split('\n');
+    const tag = core.getInput('tag');
+    const releaseId = core.getInput('release-id');
+    const selectorFiles = core.getInput('files').split('\n');
 
-  let release = null;
-  if (tag) {
-    core.info(`Getting release by tag: ${tag}`);
-    release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
-  } else if (releaseId && releaseId === 'latest') {
-    core.info('Getting latest release');
-    release = await octokit.rest.repos.getLatestRelease({ owner, repo });
-  } else if (releaseId) {
-    core.info(`Getting release ID: ${releaseId}`);
-    release = await octokit.rest.repos.getRelease({ owner, repo, releaseId });
-  } else {
-    core.setFailed('No valid tag or release ID provided.');
-  }
+    let release = null;
+    if (tag) {
+      core.info(`Getting release by tag: ${tag}`);
+      release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
+    } else if (releaseId && releaseId === 'latest') {
+      core.info('Getting latest release');
+      release = await octokit.rest.repos.getLatestRelease({ owner, repo });
+    } else if (releaseId) {
+      core.info(`Getting release ID: ${releaseId}`);
+      release = await octokit.rest.repos.getRelease({ owner, repo, releaseId });
+    } else {
+      core.setFailed('No valid tag or release ID provided.');
+    }
 
-  if (!release || !release.data) {
-    core.setFailed('Release does not exist or is unaccessible.');
-  }
+    if (!release || !release.data) {
+      core.setFailed('Release does not exist or is unaccessible.');
+    }
 
-  core.info(`${release.data.assets.length} assets available.`);
+    core.info(`${release.data.assets.length} assets available.`);
 
-  core.debug(JSON.stringify(release));
+    core.debug(JSON.stringify(release));
 
-  if (release.data.assets.length === 0) {
-    core.warning('No assets available, exiting.');
-    return;
-  }
+    if (release.data.assets.length === 0) {
+      core.warning('No assets available, exiting.');
+      return;
+    }
 
-  let assets = [];
+    let assets = [];
 
-  if (selectorFiles.length === 1 && selectorFiles[0] === '*') {
-    core.info('Downloading all assets available');
-    assets = release.data.assets;
-  } else {
-    for (const asset of release.data.assets) {
-      for (const name of selectorFiles) {
-        const rexpr = wildcardToRegExp(name);
-        if (asset.name.match(rexpr)) {
-          assets.push(asset);
+    if (selectorFiles.length === 1 && selectorFiles[0] === '*') {
+      core.info('Downloading all assets available');
+      assets = release.data.assets;
+    } else {
+      for (const asset of release.data.assets) {
+        for (const name of selectorFiles) {
+          const rexpr = wildcardToRegExp(name);
+          if (asset.name.match(rexpr)) {
+            assets.push(asset);
+          }
         }
       }
+      if (assets.length <= 0) {
+        core.setFailed('No assets selected or available.');
+      }
+      core.info(`{assets.length} assets selected.`);
     }
-    if (assets.length <= 0) {
-      core.setFailed('No assets selected or available.');
-    }
-    core.info(`{assets.length} assets selected.`);
-  }
 
-  for (const asset of assets) {
-    core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
-    const file = fs.createWriteStream(asset.name);
-    const buffer = octokit.rest.repos.getReleaseAsset({
-      headers: { Accept: 'application/octet-stream' },
-      owner,
-      repo,
-      asset_id: asset.id,
-    });
-    // core.debug(JSON.stringify(buffer));
-    file.write(buffer);
-    file.end();
+    for (const asset of assets) {
+      core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
+      const file = fs.createWriteStream(asset.name);
+      const buffer = await octokit.rest.repos.getReleaseAsset({
+        headers: { Accept: 'application/octet-stream' },
+        owner,
+        repo,
+        asset_id: asset.id,
+      });
+      // core.debug(JSON.stringify(buffer));
+      await file.write(buffer);
+      file.end();
+    }
+  } catch (error) {
+    core.setFailed(`Failed. ${error.message}`);
   }
 }
 
-try {
-  run();
-} catch (error) {
-  core.setFailed(`Failed. ${error.message}`);
-}
+run();
