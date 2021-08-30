@@ -74,8 +74,8 @@ async function run() {
         owner,
         repo,
         asset_id: asset.id,
-      }).then(({ buffer }) => {
-        file.write(buffer);
+      }).then(({ data }) => {
+        file.write(data);
       });
 
       // await file.write(Buffer.from(buffer.data));
