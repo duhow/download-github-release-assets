@@ -1,7 +1,8 @@
+import { Buffer } from 'buffer';
+
 const fs = require('fs').promises;
 const core = require('@actions/core');
 const github = require('@actions/github');
-import { Buffer } from 'buffer';
 
 // const glob = require('@actions/glob')
 
@@ -13,7 +14,7 @@ function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
 
 async function run() {
   try {
-    const [owner, repo] = core.getInput("repository", { required: true }).split("/");
+    const [owner, repo] = core.getInput('repository', { required: true }).split('/');
     core.info(`Using GitHub repository: ${owner}/${repo}`);
 
     const tag = core.getInput('tag');
@@ -67,7 +68,7 @@ async function run() {
       core.info(`${assets.length} assets selected.`);
     }
 
-    assets.forEach(asset => {
+    assets.forEach(async (asset) => {
       core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
       const file = fs.createWriteStream(asset.name);
       const buffer = await octokit.rest.repos.getReleaseAsset({
