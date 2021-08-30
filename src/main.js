@@ -37,14 +37,14 @@ async function run() {
     core.setFailed('Release does not exist or is unaccessible.');
   }
 
-  core.info(`{release.data.assets.length} assets available.`)
+  core.info(`${release.data.assets.length} assets available.`)
 
   core.debug(JSON.stringify(release))
 
   if(selectorFiles.length == 1 && selectorFiles[0] === '*'){
     core.info('Downloading all assets available')
     for(const asset of release.data.assets){
-      core.info(`Downloading {asset.name} with {asset.size} bytes`)
+      core.info(`Downloading ${asset.name} with ${asset.size} bytes`)
       const file = fs.createWriteStream(asset.name);
       const buffer = await octokit.rest.repos.getReleaseAsset({
         headers: {Accept: 'application/octet-stream'},
@@ -52,7 +52,7 @@ async function run() {
         repo: repo,
         asset_id: asset.id,
       });
-      file.write(buffer);
+      file.write(buffer.data);
       file.end();
     }
   }
