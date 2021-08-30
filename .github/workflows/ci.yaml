@@ -31,5 +31,7 @@ jobs:
       uses: ./
       with:
         tag: demo
-        files: |
-          rand*
+        files: '*'
+
+    - name: Check
+      run: ls -la
