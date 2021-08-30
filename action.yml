@@ -1,0 +1,41 @@
+name: 'Download GitHub Release Asset'
+description: 'Downloads assets from a GitHub release'
+
+inputs:
+  token:
+    description: 'The GitHub token. Typically this will be secrets.GITHUB_TOKEN'
+    required: true
+  repository:
+    description: 'The `organization/repository` containing the release.'
+    required: false
+    default: ''
+  release-id:
+    description: 'The release ID version to fetch from.'
+    required: false
+    default: 'latest'
+  tag:
+    description: 'The release version to fetch from in the form `tags/<tag_name>`'
+    required: false
+    default: ''
+  file:
+    description: 'The name of the file to be downloaded.'
+    required: true
+  target:
+    description: 'Target file path.'
+    required: false
+
+outputs:
+  name:
+    description: 'The name of the release'
+  body:
+    description: 'The body of the release'
+  version:
+    description: 'The version of the release or tag'
+
+runs:
+  using: 'node12'
+  main: 'dist/main.js'
+
+branding:
+  color: 'orange'
+  icon: 'download-cloud'

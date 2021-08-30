@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: 12.x
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    # Need root node_modules because certain npm packages like jest are configured for the entire repository and it won't be possible
+    # without these to just compile the artifacts package
+    - name: Run npm
+      run: |
+        npm install
+        npm ci

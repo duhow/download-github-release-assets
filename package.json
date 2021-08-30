@@ -1,0 +1,40 @@
+{
+  "name": "download-github-release-asset",
+  "description": "Download GitHub Release assets",
+  "version": "0.0.1",
+  "main": "src/main.js",
+  "scripts": {
+    "lint": "eslint src",
+    "prepare": "ncc build src/main.js -o dist --source-map --license LICENSE",
+    "test": "jest",
+    "all": "npm run lint && npm run prepare && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duhow/download-github-release-asset.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "duhow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/duhow/download-github-release-asset/issues"
+  },
+  "homepage": "https://github.com/duhow/download-github-release-asset#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.5"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.27.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "jest": "^26.6.3"
+  }
+}
