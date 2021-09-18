@@ -77,7 +77,7 @@ async function run() {
       });
       console.log(response);
       console.log(JSON.stringify(response));
-      file.write(response.data);
+      file.write(Buffer.from(response.data));
       file.end();
     });
   } catch (error) {
