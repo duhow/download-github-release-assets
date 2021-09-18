@@ -102,6 +102,7 @@ async function run() {
         filename = filename.replace('//', '/');
         msg += ` to ${filename}`;
       }
+      createdAssets.push(filename);
       core.info(msg);
 
       const file = fs.createWriteStream(filename);
@@ -114,8 +115,6 @@ async function run() {
       core.debug(response);
       file.write(Buffer.from(response.data));
       file.end();
-
-      createdAssets.push(filename);
     });
     await core.setOutput('assets', createdAssets);
   } catch (error) {

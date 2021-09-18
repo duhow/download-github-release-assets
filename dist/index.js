@@ -6277,7 +6277,7 @@ async function run() {
 
     let createdAssets = [];
 
-    await assets.forEach(async (asset) => {
+    assets.forEach(async (asset) => {
       let filename = asset.name;
       let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
@@ -6285,6 +6285,7 @@ async function run() {
         filename = filename.replace('//', '/');
         msg += ` to ${filename}`;
       }
+      createdAssets.push(filename);
       core.info(msg);
 
       const file = fs.createWriteStream(filename);
@@ -6297,10 +6298,8 @@ async function run() {
       core.debug(response);
       file.write(Buffer.from(response.data));
       file.end();
-
-      createdAssets.push(filename);
     });
-    core.setOutput('assets', createdAssets);
+    await core.setOutput('assets', createdAssets);
   } catch (error) {
     core.setFailed(error.message);
   }
