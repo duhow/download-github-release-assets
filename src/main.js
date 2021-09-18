@@ -94,6 +94,7 @@ async function run() {
       msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
         filename = (assets.length === 1 ? target : `${folder}/${asset.name}`);
+        filename = filename.replace("//", "/");
         msg += ` to ${filename}`
       }
       core.info(msg);
