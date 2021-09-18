@@ -1,5 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release/duhow/download-github-release-assets.svg?style=flat-square)](https://github.com/duhow/download-github-release-assets/releases/latest)
-[![Test workflow](https://img.shields.io/github/workflow/status/duhow/download-github-release-assets/ci?label=test&logo=github&style=flat-square)](https://github.com/docker/metadata-action/actions?workflow=ci)
+[![Test workflow](https://img.shields.io/github/workflow/status/duhow/download-github-release-assets/ci?label=test&logo=github&style=flat-square)](https://github.com/duhow/download-github-release-assets/actions?workflow=ci)
 
 # GitHub Action: Download GitHub Release Assets
 
