@@ -6277,7 +6277,7 @@ async function run() {
 
     let createdAssets = [];
 
-    assets.forEach(async (asset) => {
+    await assets.forEach(async (asset) => {
       let filename = asset.name;
       let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
