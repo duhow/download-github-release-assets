@@ -75,7 +75,9 @@ async function run() {
         repo,
         asset_id: asset.id,
       });
-      file.write(response);
+      console.log(response);
+      console.log(JSON.stringify(response));
+      file.write(response.data);
       file.end();
     });
   } catch (error) {
