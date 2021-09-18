@@ -94,7 +94,7 @@ async function run() {
 
     let createdAssets = [];
 
-    await assets.forEach(async (asset) => {
+    assets.forEach(async (asset) => {
       let filename = asset.name;
       let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
@@ -117,7 +117,7 @@ async function run() {
 
       createdAssets.push(filename);
     });
-    core.setOutput('assets', createdAssets);
+    await core.setOutput('assets', createdAssets);
   } catch (error) {
     core.setFailed(error.message);
   }
