@@ -1,9 +1,9 @@
-[![GitHub release](https://img.shields.io/github/release/duhow/download-github-release-asset.svg?style=flat-square)](https://github.com/duhow/download-github-release-asset/releases/latest)
-[![Test workflow](https://img.shields.io/github/workflow/status/duhow/download-github-release-asset/ci?label=test&logo=github&style=flat-square)](https://github.com/docker/metadata-action/actions?workflow=ci)
+[![GitHub release](https://img.shields.io/github/release/duhow/download-github-release-assets.svg?style=flat-square)](https://github.com/duhow/download-github-release-assets/releases/latest)
+[![Test workflow](https://img.shields.io/github/workflow/status/duhow/download-github-release-assets/ci?label=test&logo=github&style=flat-square)](https://github.com/docker/metadata-action/actions?workflow=ci)
 
 # GitHub Action: Download GitHub Release Assets
 
-Inspired by [dsaltares/fetch-gh-release-asset](https://github.com/dsaltares/fetch-gh-release-asset) GitHub Action,
+Inspired by [dsaltares/fetch-gh-release-asset](https://github.com/dsaltares/fetch-gh-release-asset) GitHub Action and several others,
 this action downloads all assets from a Release, without needing to build a Docker container.
 
 This results in a faster job execution, since GitHub Actions Runner will execute the JavaScript code directly. :)
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Download release dependencies
-        uses: duhow/download-github-release-asset@v1
+        uses: duhow/download-github-release-assets@v1
         with:
           token: ${{ secrets.PAT_TOKEN }}
           repository: actions/runner
