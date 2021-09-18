@@ -7,8 +7,8 @@ const github = require('@actions/github');
 const token = core.getInput('token');
 const octokit = github.getOctokit(token);
 
-function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEscape).join('.*')}$`); }
 function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
+function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEscape).join('.*')}$`); }
 
 async function run() {
   try {
@@ -67,35 +67,35 @@ async function run() {
     }
 
     const target = core.getInput('target');
+    let folder = target;
 
     if (target) {
-      folder = target;
-      create_folder = false;
+      let createFolder = false;
 
       // Extract filename from target path and get folders only
-      if (assets.length === 1 && target.includes("/")) {
-        create_folder = true;
+      if (assets.length === 1 && target.includes('/')) {
+        createFolder = true;
 
-        folder = target.split("/");
+        folder = target.split('/');
         folder.pop(); // remove filename
-        folder = folder.join("/");
+        folder = folder.join('/');
       } else if (assets.length > 1 || selectorFiles[0] === '*') {
-        create_folder = true;
+        createFolder = true;
       }
 
-      if (!fs.existsSync(folder) && create_folder){
+      if (!fs.existsSync(folder) && createFolder) {
         core.info(`Creating folder ${folder}`);
         fs.mkdirSync(folder, { recursive: true });
       }
     }
 
     assets.forEach(async (asset) => {
-      filename = asset.name;
-      msg = `Downloading ${asset.name} with ${asset.size} bytes`;
+      let filename = asset.name;
+      let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
         filename = (assets.length === 1 ? target : `${folder}/${asset.name}`);
-        filename = filename.replace("//", "/");
-        msg += ` to ${filename}`
+        filename = filename.replace('//', '/');
+        msg += ` to ${filename}`;
       }
       core.info(msg);
 
