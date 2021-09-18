@@ -32,6 +32,9 @@ jobs:
       with:
         tag: demo
         files: '*'
+        target: tempfolder/
 
     - name: Check
-      run: ls -la
+      run: |
+        ls -la
+        ls -la tempfolder/

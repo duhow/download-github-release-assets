@@ -66,17 +66,46 @@ async function run() {
       core.info(`${assets.length} assets selected.`);
     }
 
+    const target = core.getInput('target');
+
+    if (target) {
+      folder = target;
+      create_folder = false;
+
+      // Extract filename from target path and get folders only
+      if (assets.length === 1 && target.includes("/")) {
+        create_folder = true;
+
+        folder = target.split("/");
+        folder.pop(); // remove filename
+        folder = folder.join("/");
+      } else if (assets.length > 1 || selectorFiles[0] === '*') {
+        create_folder = true;
+      }
+
+      if (!fs.existsSync(folder) && create_folder){
+        core.info(`Creating folder ${folder}`);
+        fs.mkdirSync(folder, { recursive: true });
+      }
+    }
+
     assets.forEach(async (asset) => {
-      core.info(`Downloading ${asset.name} with ${asset.size} bytes`);
-      const file = fs.createWriteStream(asset.name);
+      filename = asset.name;
+      msg = `Downloading ${asset.name} with ${asset.size} bytes`;
+      if (target) {
+        filename = (assets.length === 1 ? target : `${folder}/${asset.name}`);
+        msg += ` to ${filename}`
+      }
+      core.info(msg);
+
+      const file = fs.createWriteStream(filename);
       const response = await octokit.rest.repos.getReleaseAsset({
         headers: { Accept: 'application/octet-stream' },
         owner,
         repo,
         asset_id: asset.id,
       });
-      console.log(response);
-      console.log(JSON.stringify(response));
+      core.debug(response);
       file.write(Buffer.from(response.data));
       file.end();
     });
