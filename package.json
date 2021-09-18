@@ -1,7 +1,7 @@
 {
   "name": "download-github-release-asset",
   "description": "Download GitHub Release assets",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
     "lint": "eslint src",
