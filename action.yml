@@ -30,8 +30,10 @@ outputs:
     description: 'The name of the release'
   body:
     description: 'The body of the release'
-  version:
-    description: 'The version of the release or tag'
+  tag:
+    description: 'The tag of the release'
+  assets:
+    description: 'List of assets downloaded'
 
 runs:
   using: 'node12'

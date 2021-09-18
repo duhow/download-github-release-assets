@@ -40,6 +40,9 @@ async function run() {
     core.info(`${release.data.assets.length} assets available.`);
 
     core.debug(JSON.stringify(release));
+    core.setOutput('name', release.name);
+    core.setOutput('body', release.body);
+    core.setOutput('tag', release.tag_name);
 
     if (release.data.assets.length === 0) {
       core.warning('No assets available, exiting.');
@@ -89,6 +92,8 @@ async function run() {
       }
     }
 
+    const createdAssets = [];
+
     assets.forEach(async (asset) => {
       let filename = asset.name;
       let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
@@ -109,7 +114,10 @@ async function run() {
       core.debug(response);
       file.write(Buffer.from(response.data));
       file.end();
+
+      createdAssets.push(filename);
     });
+    core.setOutput('assets', createdAssets);
   } catch (error) {
     core.setFailed(error.message);
   }
