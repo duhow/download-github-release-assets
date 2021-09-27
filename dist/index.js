@@ -6195,12 +6195,20 @@ function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEs
 
 async function run() {
   try {
-    const [owner, repo] = core.getInput('repository', { required: true }).split('/');
+    const repoString = core.getInput('repo') || core.getInput('repository');
+    if (!repoString) {
+      core.setFailed('Repository variable empty or not defined.');
+    }
+    const [owner, repo] = repoString.split('/');
     core.info(`Using GitHub repository: ${owner}/${repo}`);
 
-    const tag = core.getInput('tag');
+    const tag = core.getInput('tag') || core.getInput('version');
     const releaseId = core.getInput('release-id');
-    const selectorFiles = core.getInput('files').split('\n');
+    const filesString = core.getInput('file') || core.getInput('files');
+    if (!filesString) {
+      core.setFailed('File selector empty or not defined.');
+    }
+    const selectorFiles = filesString.split('\n');
 
     let release = null;
     if (tag) {
