@@ -30,7 +30,7 @@ jobs:
     - name: Self-test
       uses: ./
       with:
-        tag: demo
+        tag: 1.0.1
         files: '*'
         target: tempfolder/
 
