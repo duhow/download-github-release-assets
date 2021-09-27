@@ -77,6 +77,8 @@ async function run() {
       core.info(`${assets.length} assets selected.`);
     }
 
+    const download = (core.getInput('download') !== 'false');
+
     const target = core.getInput('target');
     let folder = target;
 
@@ -94,7 +96,7 @@ async function run() {
         createFolder = true;
       }
 
-      if (!fs.existsSync(folder) && createFolder) {
+      if (!fs.existsSync(folder) && createFolder && download) {
         core.info(`Creating folder ${folder}`);
         fs.mkdirSync(folder, { recursive: true });
       }
@@ -104,7 +106,11 @@ async function run() {
 
     assets.forEach(async (asset) => {
       let filename = asset.name;
-      let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
+      let msg = '';
+      if (!download) {
+        msg += '*NOT* ';
+      }
+      msg += `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
         filename = (assets.length === 1 && !target.endsWith('/') ? target : `${folder}/${asset.name}`);
         filename = filename.replace('//', '/');
@@ -112,6 +118,8 @@ async function run() {
       }
       createdAssets.push(filename);
       core.info(msg);
+
+      if (!download) { return; }
 
       const file = fs.createWriteStream(filename);
       const response = await octokit.rest.repos.getReleaseAsset({

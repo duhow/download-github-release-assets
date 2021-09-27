@@ -74,6 +74,10 @@ files: |
 Target file path. If several `files` are specified, this is the folder to download the files (recursive folders will be created if don't exist).
 If `files` contains a single file, this is the full path to download the file (recursive folders will be created).
 
+### `download`
+
+Set to false if you do not want to download files, output assets still will contain selected files.
+
 ## Outputs
 
 ### `name`
