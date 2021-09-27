@@ -19,13 +19,21 @@ async function run() {
     const [owner, repo] = repoString.split('/');
     core.info(`Using GitHub repository: ${owner}/${repo}`);
 
-    const tag = core.getInput('tag') || core.getInput('version');
+    let tag = core.getInput('tag') || core.getInput('version');
     const releaseId = core.getInput('release-id');
     const filesString = core.getInput('file') || core.getInput('files');
     if (!filesString) {
       core.setFailed('File selector empty or not defined.');
     }
     const selectorFiles = filesString.split('\n');
+
+    const prefixTagsClean = ['refs/', 'tags/'];
+    for (const prefix of prefixTagsClean) {
+      if (tag.startsWith(prefix)) {
+        tag = tag.slice(prefix.length);
+        core.debug(`Truncated tag to ${tag}`);
+      }
+    }
 
     let release = null;
     if (tag) {
