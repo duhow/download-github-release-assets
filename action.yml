@@ -31,6 +31,9 @@ inputs:
   target:
     description: 'Target file path.'
     required: false
+  download:
+    description: 'Set to false if you do not want to download files, output assets still will contain selected files.'
+    required: false
 
 outputs:
   name:
