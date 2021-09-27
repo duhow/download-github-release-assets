@@ -55,7 +55,7 @@ async function run() {
     if (tag) {
       tagAttempts.forEach((tagAttempt, idx) => {
         try {
-          if (release !== null) { return; }
+          if (release) { return; }
           core.info(`Getting release by tag: ${tagAttempt}`);
           release = octokit.rest.repos.getReleaseByTag({ owner, repo, tagAttempt });
         } catch (error) {
