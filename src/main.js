@@ -31,12 +31,12 @@ async function run() {
     if (tag) {
       core.info(`Getting release by tag: ${tag}`);
       release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
-    } else if (releaseId && releaseId === 'latest') {
-      core.info('Getting latest release');
-      release = await octokit.rest.repos.getLatestRelease({ owner, repo });
-    } else if (releaseId) {
+    } else if (!Number.isNaN(releaseId)) { // is numeric
       core.info(`Getting release ID: ${releaseId}`);
       release = await octokit.rest.repos.getRelease({ owner, repo, releaseId });
+    } else if (!releaseId || releaseId === 'latest') {
+      core.info('Getting latest release');
+      release = await octokit.rest.repos.getLatestRelease({ owner, repo });
     } else {
       core.setFailed('No valid tag or release ID provided.');
     }
