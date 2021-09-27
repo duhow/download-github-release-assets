@@ -53,13 +53,13 @@ async function run() {
 
     let release = null;
     if (tag) {
-      tagAttempts.forEach(async (tagAttempt) => {
+      tagAttempts.forEach((tagAttempt, idx) => {
         try {
           if (release !== null) { return; }
           core.info(`Getting release by tag: ${tagAttempt}`);
-          release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tagAttempt });
+          release = octokit.rest.repos.getReleaseByTag({ owner, repo, tagAttempt });
         } catch (error) {
-          if (tagAttempts.length > 1) {
+          if (tagAttempts.length > 1 && idx !== tagAttempts.length - 1) {
             core.warning('Error, attempting with another fallback tag.');
           }
         }
