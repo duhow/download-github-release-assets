@@ -6281,7 +6281,7 @@ async function run() {
       let filename = asset.name;
       let msg = `Downloading ${asset.name} with ${asset.size} bytes`;
       if (target) {
-        filename = (assets.length === 1 ? target : `${folder}/${asset.name}`);
+        filename = (assets.length === 1 && !target.endsWith('/') ? target : `${folder}/${asset.name}`);
         filename = filename.replace('//', '/');
         msg += ` to ${filename}`;
       }
