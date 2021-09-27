@@ -10,17 +10,25 @@ inputs:
     description: 'The `organization/repository` containing the release.'
     default: ${{ github.repository }}
     required: false
+  repo:
+    description: 'Alias for repository.'
+    required: false
   release-id:
     description: 'The release ID version to fetch from.'
     default: 'latest'
     required: false
   tag:
     description: 'The release version to fetch from in the form `tags/<tag_name>`'
-    default: ''
+    required: false
+  version:
+    description: 'Alias for tag.'
     required: false
   files:
     description: 'Name or list of files to download.'
-    required: true
+    required: false
+  file:
+    description: 'Alias for files.'
+    required: false
   target:
     description: 'Target file path.'
     required: false
