@@ -10,6 +10,8 @@ const octokit = github.getOctokit(token);
 function regExpEscape(s) { return s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'); }
 function wildcardToRegExp(s) { return new RegExp(`^${s.split(/\*+/).map(regExpEscape).join('.*')}$`); }
 
+const SEMVER_PATTERN = /^v?(?<major>\d+)\.(?<minor>\d+)(?:\.(?<patch>\d+))?(?:-(?<pre_release>[\w.]+))?$/;
+
 async function run() {
   try {
     const repoString = core.getInput('repo') || core.getInput('repository');
@@ -35,10 +37,33 @@ async function run() {
       }
     }
 
+    const tagAttempts = [];
+    if (tag) {
+      tagAttempts.push(tag);
+
+      // Add tag with/out leading v
+      if (tag.match(SEMVER_PATTERN)) {
+        if (tag.startsWith('v')) {
+          tagAttempts.push(tag.slice(1));
+        } else {
+          tagAttempts.push('v'.concat(tag));
+        }
+      }
+    }
+
     let release = null;
     if (tag) {
-      core.info(`Getting release by tag: ${tag}`);
-      release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
+      tagAttempts.forEach((tagAttempt, idx) => {
+        try {
+          if (release) { return; }
+          core.info(`Getting release by tag: ${tagAttempt}`);
+          release = octokit.rest.repos.getReleaseByTag({ owner, repo, tagAttempt });
+        } catch (error) {
+          if (tagAttempts.length > 1 && idx !== tagAttempts.length - 1) {
+            core.warning('Error, attempting with another fallback tag.');
+          }
+        }
+      });
     } else if (!Number.isNaN(releaseId)) { // is numeric
       core.info(`Getting release ID: ${releaseId}`);
       release = await octokit.rest.repos.getRelease({ owner, repo, releaseId });
@@ -110,7 +135,7 @@ async function run() {
       }
     }
 
-    let createdAssets = [];
+    const createdAssets = [];
 
     assets.forEach(async (asset) => {
       let filename = asset.name;
