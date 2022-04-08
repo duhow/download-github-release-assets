@@ -6224,7 +6224,7 @@ async function run() {
       release = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
     } else if (!Number.isNaN(releaseId)) { // is numeric
       core.info(`Getting release ID: ${releaseId}`);
-      release = await octokit.rest.repos.getRelease({ owner, repo, releaseId });
+      release = await octokit.rest.repos.getRelease({ owner, repo, release_id: releaseId });
     } else if (!releaseId || releaseId === 'latest') {
       core.info('Getting latest release');
       release = await octokit.rest.repos.getLatestRelease({ owner, repo });
